@@ -7,7 +7,7 @@ let virtualDom1 = createElement('ul', { class: 'list' }, [
     createElement('li', { class: 'item' }, ['c'])
 ])
 
-let virtualDom2 = createElement('ul', { class: 'list' }, [
+let virtualDom2 = createElement('ul', { class: 'list-group' }, [
     createElement('li', { class: 'item' }, ['a']),
     createElement('li', { class: 'item' }, ['b']),
     createElement('li', { class: 'item' }, ['c'])
@@ -18,4 +18,4 @@ let virtualDom2 = createElement('ul', { class: 'list' }, [
 // renderDom(el, document.body)
 // console.log(el, '3')
 
-let patchs = diff(virtualDom1, virtualDom2)
+let patches = diff(virtualDom1, virtualDom2)

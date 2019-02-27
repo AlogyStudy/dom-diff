@@ -1,7 +1,7 @@
 class _Element {
-    private type: string
-    private props: object
-    private children: Array<any>
+    public type: string
+    public props: object
+    public children: Array<any>
     constructor (type: string, props: object, children: Array<any>) {
         this.type = type
         this.props = props
