@@ -11,21 +11,40 @@ const REPLACE = 'REPLACE'
 // 节点类型不同，直接采用替换模式{type: 'REPLACE', newNode: newNode}
 // 文本的变化 {type: 'TEXT', text: 1}
 
-function diff (oldTree: _Element, newTree: _Element): object {
-    let patches = {}
+/**
+ * 区分二棵树的异同点
+ * @param oldTree 老树
+ * @param newTree 新树
+ * @returns { Object } 返回更新后的补丁包
+ */
+function diff (oldTree: _Element, newTree: _Element): Object {
+    let patches = {} // 补丁
     let index = 0
     // 递归树，比较后的结果放到补丁包中
     walk(oldTree, newTree, index, patches)
     return patches
 }
 
+/**
+ * 当前节点的判断
+ * @param oldNode 新节点
+ * @param newNode 老节点
+ * @param index 递归层级
+ * @param patches 补丁包
+ */
 function walk (oldNode: _Element, newNode: _Element, index: number, patches: {[key: string]: any}) {
-    let currentPatch = []
-    if (oldNode.type === newNode.type) {
+    let currentPatch = [] // 每个元素的补丁对象
+    if (isString(oldNode) && isString(newNode)) {
+        if (oldNode !== newNode) {
+            currentPatch.push({type: TEXT, text: newNode})
+        }    
+    } else if (oldNode.type === newNode.type) { // 节点类型是否相同
         let attrs = diffAttrs(oldNode.props, newNode.props)
         if (Object.keys(attrs).length > 0) {
             currentPatch.push({type: ATTRS, attrs})
         }
+        // 比较children
+        diffChildren(oldNode.children, newNode.children, index, patches)
     }
     if (currentPatch.length > 0) {
         // 将元素和补丁包对应起来，放到大补丁包中
@@ -34,6 +53,26 @@ function walk (oldNode: _Element, newNode: _Element, index: number, patches: {[k
     }
 }
 
+function isString (node: any): boolean {
+    return Object.prototype.toString.call(node) === '[object String]'
+}
+
+/**
+ * 对比children节点
+ * @param oldChildren 子老节点 
+ * @param newChildren 子新节点
+ */
+function diffChildren (oldChildren: Array<any>, newChildren: Array<any>, index: number, patches: {[key: string]: any}) {
+    oldChildren.forEach((children, idx) => {
+        walk(children, newChildren[idx], index, patches)
+    })
+}
+
+/**
+ * 节点属性的diff
+ * @param oldAttrs 旧属性 
+ * @param newAttrs 新属性
+ */
 function diffAttrs (oldAttrs: any, newAttrs: any) {
     // 1. 新老属性的关系
     // 2. 新增属性
