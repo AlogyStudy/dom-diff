@@ -45,7 +45,6 @@ function render (eleObj: any): Element {
     }
     eleObj.children.forEach((child: any) => {
         let ret = (child instanceof _Element) ? render(child) : document.createTextNode(child)
-        console.log(ret, 'ret')
         el.appendChild(ret)
     })
     return el

@@ -34,10 +34,12 @@ function diff (oldTree: _Element, newTree: _Element): Object {
  */
 function walk (oldNode: _Element, newNode: _Element, index: number, patches: {[key: string]: any}) {
     let currentPatch = [] // 每个元素的补丁对象
-    if (isString(oldNode) && isString(newNode)) {
-        if (oldNode !== newNode) {
+    if (!newNode) { // 是否删除节点
+        currentPatch.push({type: REMOVE, index})
+    } else if (isString(oldNode) && isString(newNode)) {
+        if (oldNode !== newNode) { // 文本是否相同
             currentPatch.push({type: TEXT, text: newNode})
-        }    
+        }
     } else if (oldNode.type === newNode.type) { // 节点类型是否相同
         let attrs = diffAttrs(oldNode.props, newNode.props)
         if (Object.keys(attrs).length > 0) {
@@ -45,11 +47,12 @@ function walk (oldNode: _Element, newNode: _Element, index: number, patches: {[k
         }
         // 比较children
         diffChildren(oldNode.children, newNode.children, index, patches)
+    } else { // 节点替换
+        currentPatch.push({type: REPLACE, newNode})
     }
     if (currentPatch.length > 0) {
         // 将元素和补丁包对应起来，放到大补丁包中
         patches[index] = currentPatch
-        console.log(patches, 'patches')
     }
 }
 
@@ -62,9 +65,11 @@ function isString (node: any): boolean {
  * @param oldChildren 子老节点 
  * @param newChildren 子新节点
  */
+let Index: number = 0
 function diffChildren (oldChildren: Array<any>, newChildren: Array<any>, index: number, patches: {[key: string]: any}) {
     oldChildren.forEach((children, idx) => {
-        walk(children, newChildren[idx], index, patches)
+        // index 每次传递给walk时， index是递增，都基于一个索引来实现。
+        walk(children, newChildren[idx], ++Index, patches)
     })
 }
 
