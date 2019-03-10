@@ -13,7 +13,7 @@ function walk (node: any) {
     let childNodes = node.childNodes
     childNodes.forEach((child: any) => walk(child)) // 递归，先序深度遍历
     if (currentPatchs) {
-        doPatch(node, currentPatchs) // 从子往夫打补丁
+        doPatch(node, currentPatchs) // 从子往父打补丁
     }
 }
 
